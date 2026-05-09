@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Abyssal Register — Vol. IV</title>
+<style>
+  /* ---------- Theme variables ---------- */
+  :root {
+    --bg: #f1ead8;
+    --bg-grain: rgba(60, 40, 20, 0.04);
+    --ink: #1a1612;
+    --ink-soft: #4a3f33;
+    --rule: #1a1612;
+    --accent: #b3411a;
+    --paper: #e8dfc6;
+    --highlight: #f5d76e;
+    --shadow: rgba(26, 22, 18, 0.12);
+    --serif: Georgia, 'Times New Roman', Times, serif;
+    --display: 'Didot', 'Bodoni 72', Georgia, serif;
+    --mono: 'Courier New', Courier, monospace;
+  }
+
+  body.sonar {
+    --bg: #06121c;
+    --bg-grain: rgba(0, 200, 255, 0.03);
+    --ink: #d6f0ff;
+    --ink-soft: #6a93ad;
+    --rule: #1d4a64;
+    --accent: #00e5ff;
+    --paper: #0c1d2b;
+    --highlight: #ffea3a;
+    --shadow: rgba(0, 229, 255, 0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--serif);
+    line-height: 1.5;
+    min-height: 100vh;
+    transition: background 0.6s ease, color 0.6s ease;
+  }
+
+  /* Grain / paper texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 20% 30%, var(--bg-grain) 1px, transparent 1px),
+      radial-gradient(circle at 70% 80%, var(--bg-grain) 1px, transparent 1px),
+      radial-gradient(circle at 40% 60%, var(--bg-grain) 1px, transparent 1px);
+    background-size: 7px 7px, 11px 11px, 5px 5px;
+    z-index: 0;
+    opacity: 0.9;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 56px 48px 80px;
+  }
+
+  /* ---------- Header / masthead ---------- */
+  .masthead {
+    border-top: 6px double var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 28px 0 20px;
+    text-align: center;
+    position: relative;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+
+  .title {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(40px, 7vw, 76px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-style: italic;
+  }
+
+  .title .amp {
+    color: var(--accent);
+    font-style: italic;
+    padding: 0 4px;
+  }
+
+  .subtitle {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-soft);
+    margin-top: 14px;
+    font-size: 15px;
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 22px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .meta-row .date {
+    color: var(--ink);
+  }
+
+  /* ---------- View toggle ---------- */
+  .toggle {
+    background: transparent;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+  }
+
+  .toggle:hover {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .toggle::before {
+    content: '◐';
+    margin-right: 8px;
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  body.sonar .toggle::before { content: '◑'; }
+
+  /* ---------- Section intro ---------- */
+  .intro {
+    margin: 44px 0 28px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .intro h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-style: italic;
+    font-size: 28px;
+    line-height: 1.1;
+    border-left: 2px solid var(--accent);
+    padding-left: 16px;
+  }
+
+  .intro p {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+  }
+
+  .intro p::first-letter {
+    font-family: var(--display);
+    font-size: 42px;
+    float: left;
+    line-height: 0.9;
+    margin: 4px 8px 0 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ---------- Table ---------- */
+  .ledger {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    background: var(--paper);
+    box-shadow: 0 2px 0 var(--shadow), 0 12px 40px var(--shadow);
+  }
+
+  .ledger thead th {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-align: left;
+    padding: 16px 18px;
+    border-bottom: 2px solid var(--rule);
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: color 0.2s ease, background 0.2s ease;
+  }
+
+  .ledger thead th:hover {
+    color: var(--accent);
+  }
+
+  .ledger thead th .arrow {
+    display: inline-block;
+    margin-left: 6px;
+    opacity: 0.3;
+    font-size: 9px;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .ledger thead th.sort-asc .arrow,
+  .ledger thead th.sort-desc .arrow {
+    opacity: 1;
+    color: var(--accent);
+  }
+
+  .ledger thead th.sort-desc .arrow {
+    transform: rotate(180deg);
+  }
+
+  .ledger tbody td {
+    padding: 18px;
+    border-bottom: 1px solid var(--rule);
+    font-size: 15px;
+    vertical-align: top;
+  }
+
+  .ledger tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .ledger tbody tr {
+    transition: background 0.2s ease;
+  }
+
+  .ledger tbody tr:hover {
+    background: var(--bg);
+  }
+
+  .vessel {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--ink);
+  }
+
+  .vessel-id {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+
+  .depth {
+    font-family: var(--mono);
+    font-size: 14px;
+  }
+
+  .depth::after {
+    content: ' m';
+    color: var(--ink-soft);
+    font-size: 11px;
+  }
+
+  .specimens {
+    font-family: var(--mono);
+    font-size: 13px;
+    text-align: right;
+  }
+
+  .status {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid currentColor;
+  }
+
+  .status.recovered { color: var(--ink); }
+  .status.transmitting { color: var(--accent); }
+  .status.silent { color: var(--ink-soft); opacity: 0.7; }
+  .status.lost { color: var(--accent); border-style: dashed; }
+
+  /* ---------- Compact mode (sonar layout densifies) ---------- */
+  body.sonar .ledger tbody td {
+    padding: 12px 18px;
+    font-size: 13px;
+  }
+
+  body.sonar .vessel {
+    font-size: 15px;
+  }
+
+  /* ---------- Footer ---------- */
+  .colophon {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .colophon .seal {
+    color: var(--accent);
+  }
+
+  /* ---------- Reveal animation ---------- */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .masthead, .intro, .ledger, .colophon {
+    animation: rise 0.7s ease both;
+  }
+  .intro { animation-delay: 0.1s; }
+  .ledger { animation-delay: 0.2s; }
+  .colophon { animation-delay: 0.3s; }
+
+  @media (max-width: 720px) {
+    .page { padding: 32px 20px; }
+    .intro { grid-template-columns: 1fr; gap: 20px; }
+    .ledger thead th, .ledger tbody td { padding: 12px 10px; font-size: 13px; }
+    .meta-row { flex-direction: column; gap: 14px; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+
+    <header class="masthead">
+      <div class="eyebrow">Bureau of Hadal Cartography &middot; Restricted Circulation</div>
+      <h1 class="title">The Abyssal<span class="amp"> &amp; </span>Register</h1>
+      <div class="subtitle">A quarterly accounting of crewed and autonomous descents below 4,000 metres.</div>
+      <div class="meta-row">
+        <span class="date">Filed &mdash; <span id="filed-date">May 9, 2026</span></span>
+        <button class="toggle" id="viewToggle" aria-pressed="false">Switch to Sonar View</button>
+        <span>Vol. IV &middot; No. 02</span>
+      </div>
+    </header>
+
+    <section class="intro">
+      <h2>Field Log,<br>Spring Quarter</h2>
+      <p>Five expeditions concluded operations in the Mariana, Kermadec, and Sunda fringe trenches this season. Specimen counts have been verified against the Hobart manifest; depth readings are corrected for thermohaline drift. Sort the ledger by any column to inspect the quarter from a different angle.</p>
+    </section>
+
+    <table class="ledger" id="ledger">
+      <thead>
+        <tr>
+          <th data-key="vessel" data-type="string">Vessel<span class="arrow">▾</span></th>
+          <th data-key="trench" data-type="string">Trench<span class="arrow">▾</span></th>
+          <th data-key="depth" data-type="number">Depth<span class="arrow">▾</span></th>
+          <th data-key="specimens" data-type="number" style="text-align:right">Specimens<span class="arrow">▾</span></th>
+          <th data-key="status" data-type="string">Status<span class="arrow">▾</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="vessel">Halcyon-9</span><span class="vessel-id">REG-AH/2104</span></td>
+          <td>Kermadec</td>
+          <td><span class="depth">8420</span></td>
+          <td class="specimens">142</td>
+          <td><span class="status recovered">Recovered</span></td>
+        </tr>
+        <tr>
+          <td><span class="vessel">Lethe</span><span class="vessel-id">REG-LE/0317</span></td>
+          <td>Mariana</td>
+          <td><span class="depth">10912</span></td>
+          <td class="specimens">28</td>
+          <td><span class="status lost">Presumed Lost</span></td>
+        </tr>
+        <tr>
+          <td><span class="vessel">Polaris Drift</span><span class="vessel-id">REG-PD/8861</span></td>
+          <td>Sunda</td>
+          <td><span class="depth">6204</span></td>
+          <td class="specimens">311</td>
+          <td><span class="status transmitting">Transmitting</span></td>
+        </tr>
+        <tr>
+          <td><span class="vessel">Cetacea II</span><span class="vessel-id">REG-CT/0029</span></td>
+          <td>Puerto Rico</td>
+          <td><span class="depth">7890</span></td>
+          <td class="specimens">87</td>
+          <td><span class="status silent">Silent Run</span></td>
+        </tr>
+        <tr>
+          <td><span class="vessel">Sounding Bell</span><span class="vessel-id">REG-SB/4456</span></td>
+          <td>Kermadec</td>
+          <td><span class="depth">9105</span></td>
+          <td class="specimens">203</td>
+          <td><span class="status recovered">Recovered</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <footer class="colophon">
+      <span>Set in Didot &amp; Courier</span>
+      <span class="seal">✦ Bureau Seal ✦</span>
+      <span>Page 01 / 01</span>
+    </footer>
+
+  </div>
+
+<script>
+  // ---- Filed date (today, formatted) ----
+  (function(){
+    const d = new Date();
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    document.getElementById('filed-date').textContent = months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+  })();
+
+  // ---- View toggle (Manuscript ↔ Sonar) ----
+  const toggle = document.getElementById('viewToggle');
+  toggle.addEventListener('click', () => {
+    const onSonar = document.body.classList.toggle('sonar');
+    toggle.textContent = onSonar ? 'Switch to Manuscript View' : 'Switch to Sonar View';
+    toggle.setAttribute('aria-pressed', String(onSonar));
+  });
+
+  // ---- Sortable table ----
+  const table = document.getElementById('ledger');
+  const tbody = table.querySelector('tbody');
+  const headers = table.querySelectorAll('thead th');
+
+  // Cache the visible/comparable value for each cell, per column index.
+  function cellValue(row, idx, type) {
+    const cell = row.children[idx];
+    // Prefer .depth or .specimens text if present, else full text
+    const inner = cell.querySelector('.depth, .specimens, .vessel, .status');
+    const raw = (inner ? inner.textContent : cell.textContent).trim();
+    if (type === 'number') return parseFloat(raw.replace(/[^0-9.\-]/g, '')) || 0;
+    return raw.toLowerCase();
+  }
+
+  headers.forEach((th, idx) => {
+    th.addEventListener('click', () => {
+      const type = th.dataset.type;
+      const isAsc = !th.classList.contains('sort-asc');
+
+      // Reset all
+      headers.forEach(h => h.classList.remove('sort-asc','sort-desc'));
+      th.classList.add(isAsc ? 'sort-asc' : 'sort-desc');
+
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      rows.sort((a, b) => {
+        const va = cellValue(a, idx, type);
+        const vb = cellValue(b, idx, type);
+        if (va < vb) return isAsc ? -1 : 1;
+        if (va > vb) return isAsc ? 1 : -1;
+        return 0;
+      });
+      rows.forEach(r => tbody.appendChild(r));
+    });
+  });
+</script>
+</body>
+</html>
